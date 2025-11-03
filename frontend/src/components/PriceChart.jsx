@@ -1,6 +1,6 @@
 import Plot from 'react-plotly.js';
 
-function PriceChart({ symbol, data, timeframe }) {
+function PriceChart({ symbol, data, timeframe, apiBase }) {
   if (!data || data.length === 0) {
     return (
       <div className="chart-container">
@@ -95,7 +95,19 @@ function PriceChart({ symbol, data, timeframe }) {
 
   return (
     <div className="chart-container">
-      <h3 className="chart-title">💹 Price Chart - {symbol?.toUpperCase()}</h3>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h3 className="chart-title">💹 Price Chart - {symbol?.toUpperCase()}</h3>
+        <button
+          className="button secondary"
+          onClick={() => {
+            if (!symbol) return;
+            const url = `${apiBase}/export/${symbol}?timeframe=${encodeURIComponent(timeframe)}`;
+            window.open(url, '_blank');
+          }}
+        >
+          ⬇️ Download CSV
+        </button>
+      </div>
       <Plot
         data={[candlestickTrace, volumeTrace]}
         layout={layout}

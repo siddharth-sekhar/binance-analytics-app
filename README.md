@@ -6,6 +6,7 @@ A full‑stack, real‑time analytics dashboard for Binance perpetual futures sy
 
 - Live ingestion from Binance fstreams (e.g., btcusdt, ethusdt)
 - Upload NDJSON historical ticks and resample to OHLCV
+- Upload OHLCV CSV (ts, open, high, low, close, volume) per symbol/timeframe
 - Resampling intervals: 1s, 1min, 5min (configurable in UI)
 - Pair analytics: OLS hedge ratio (β, α), R², spread, rolling z‑score, rolling correlation
 - ADF stationarity test for spread
@@ -22,7 +23,7 @@ A full‑stack, real‑time analytics dashboard for Binance perpetual futures sy
 
 ```
 backend/          # FastAPI service, ingestion, analytics, storage
-frotntend/        # React + Vite app (note the folder name is intentionally 'frotntend')
+frontend/         # React + Vite app
 assets/           # Misc HTML/demo assets
 ```
 
@@ -35,9 +36,9 @@ Key backend files:
 - `backend/requirements.txt` — Python dependencies
 
 Key frontend files:
-- `frotntend/src/App.jsx` — App shell, tabs, API base
-- `frotntend/src/components/*` — Dashboard, charts, controls, ingestion panel
-- `frotntend/vite.config.js` — Dev server host/port (5173)
+- `frontend/src/App.jsx` — App shell, tabs, API base
+- `frontend/src/components/*` — Dashboard, charts, controls, ingestion panel
+- `frontend/vite.config.js` — Dev server host/port (5173)
 
 ## Prerequisites
 
@@ -61,12 +62,12 @@ Run frontend (http://localhost:5173):
 
 ```powershell
 # In a new PowerShell window
-cd frotntend
+cd frontend
 npm install
 npm run dev
 ```
 
-Open http://localhost:5173 in your browser. The app expects the backend at http://localhost:8000 (configured in `frotntend/src/App.jsx`).
+Open http://localhost:5173 in your browser. The app expects the backend at http://localhost:8000 (configured in `frontend/src/App.jsx`).
 
 ## Using the App
 
@@ -80,6 +81,11 @@ Open http://localhost:5173 in your browser. The app expects the backend at http:
 - In the "Analytics Dashboard" tab, select symbols and timeframe
 - View candlestick + volume charts
 - If two symbols are selected, pair analytics (spread, z‑score, correlation) are shown
+
+Optional) Upload OHLCV CSV
+- In the "Data Ingestion" tab, use the "Upload OHLCV CSV" section
+- Select a symbol and timeframe, then choose a CSV with headers: `ts, open, high, low, close, volume`
+- Submit to load bars directly; these bars will be used for that symbol/timeframe
 
 3) Export data
 - Use the backend export endpoint to download CSV: `/api/export/{symbol}?timeframe=1s`
@@ -95,6 +101,11 @@ Base URL: `http://localhost:8000/api`
 - POST `/upload_ndjson`
   - Form file: `file` (NDJSON where each line is `{symbol, ts, price, size}`)
   - Loads historical ticks to storage/DB
+
+- POST `/upload_ohlcv`
+  - Multipart form fields: `symbol` (e.g., `btcusdt`), `timeframe` (e.g., `1s`, `1min`, `5min`), `file` (CSV)
+  - CSV must contain headers: `ts, open, high, low, close, volume`
+  - Loads OHLCV bars into memory and serves them for that symbol/timeframe
 
 - GET `/symbols`
   - Returns currently known symbols in memory
@@ -123,12 +134,13 @@ Base URL: `http://localhost:8000/api`
 
 - Ticks are appended to a local SQLite DB file (default `backend_ticks.db` via `TickStorage(db_file="backend_ticks.db")` in `app.py`)
 - In‑memory DataFrames are kept per symbol and trimmed to the last 7 days for memory control
+- Uploaded OHLCV bars are stored in-memory and take precedence when requesting `/api/resampled/{symbol}?timeframe=...` for the uploaded timeframe. They are not persisted to disk by default.
 
 ## Configuration Notes
 
 - No Binance API keys are required (public trade streams)
 - CORS is open (`*`) for local development
-- API base for the frontend is hard‑coded in `frotntend/src/App.jsx` (`http://localhost:8000/api`)
+- API base for the frontend is hard‑coded in `frontend/src/App.jsx` (`http://localhost:8000/api`)
 
 ## Troubleshooting
 
@@ -153,7 +165,7 @@ uvicorn backend.app:app --reload --port 8000
 
 Frontend:
 ```powershell
-cd frotntend
+cd frontend
 npm run dev
 npm run build
 npm run preview

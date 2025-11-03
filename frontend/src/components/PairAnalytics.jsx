@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Plot from 'react-plotly.js';
 
-function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow }) {
+function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVolume = 0 }) {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [regressionType, setRegressionType] = useState('ols');
   const [adfTrigger, setAdfTrigger] = useState(false);
+  const [newAlert, setNewAlert] = useState({ metric: 'zscore', op: '>', threshold: 2 });
 
   const fetchAnalytics = useCallback(async () => {
     if (!symbolX || !symbolY) return;
@@ -20,7 +21,9 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow }) {
           x: symbolX,
           y: symbolY,
           timeframe,
-          roll_window: rollWindow
+          roll_window: rollWindow,
+          regression: regressionType,
+          min_volume: minVolume
         }
       });
       
@@ -36,7 +39,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow }) {
     } finally {
       setLoading(false);
     }
-  }, [symbolX, symbolY, apiBase, timeframe, rollWindow]);
+  }, [symbolX, symbolY, apiBase, timeframe, rollWindow, regressionType, minVolume]);
 
   useEffect(() => {
     fetchAnalytics();
@@ -79,6 +82,10 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow }) {
 
   // Prepare data for charts
   const spreadTimestamps = Object.keys(analytics.spread || {});
+  // Backtest equity curve
+  const equityTimestamps = Object.keys(analytics.backtest?.equity || {});
+  const equityValues = Object.values(analytics.backtest?.equity || {});
+
   const spreadValues = Object.values(analytics.spread || {});
   const zscoreTimestamps = Object.keys(analytics.zscore || {});
   const zscoreValues = Object.values(analytics.zscore || {});
@@ -228,8 +235,8 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow }) {
         </div>
         
         <div className="stats-card">
-          <h4>Regression Type</h4>
-          <button
+          <h4>Regression</h4>
+          <select
             value={regressionType}
             onChange={(e) => setRegressionType(e.target.value)}
             style={{
@@ -242,7 +249,18 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow }) {
               borderRadius: '6px'
             }}
           >
-            <option value="ols">OLS (Ordinary Least Squares)</option>
+            <option value="ols">OLS</option>
+            <option value="kalman">Kalman</option>
+          </select>
+          <button
+            className="button secondary"
+            style={{ marginTop: '0.5rem' }}
+            onClick={() => {
+              const url = `${apiBase}/analytics/pair_export?x=${encodeURIComponent(symbolX)}&y=${encodeURIComponent(symbolY)}&timeframe=${encodeURIComponent(timeframe)}&roll_window=${encodeURIComponent(rollWindow)}&regression=${encodeURIComponent(regressionType)}&min_volume=${encodeURIComponent(minVolume)}`;
+              window.open(url, '_blank');
+            }}
+          >
+            ⬇️ Download Analytics CSV
           </button>
         </div>
         
@@ -311,6 +329,77 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow }) {
             style={{ width: '100%' }}
             useResizeHandler={true}
           />
+        </div>
+
+        {/* Backtest Equity Curve */}
+        <div className="chart-container">
+          <h3 className="chart-title">💼 Backtest Equity (Z-Score MR)</h3>
+          <Plot
+            data={[{
+              x: equityTimestamps,
+              y: equityValues,
+              type: 'scatter',
+              mode: 'lines',
+              name: 'Equity',
+              line: { color: '#26a69a', width: 2 }
+            }]}
+            layout={{
+              ...chartLayout,
+              title: { text: 'Equity Curve', font: { color: '#d0d0d0', size: 14 } }
+            }}
+            config={config}
+            style={{ width: '100%' }}
+            useResizeHandler={true}
+          />
+        </div>
+      </div>
+
+      {/* Alerts UI */}
+      <div style={{ marginTop: '1rem', display: 'grid', gap: '0.75rem' }}>
+        <div className="summary-stats">
+          <div className="stats-card">
+            <h4>Create Alert</h4>
+            <div style={{ display: 'grid', gap: '0.5rem' }}>
+              <select value={newAlert.metric} onChange={(e) => setNewAlert({ ...newAlert, metric: e.target.value })}>
+                <option value="zscore">zscore</option>
+                <option value="spread">spread</option>
+              </select>
+              <select value={newAlert.op} onChange={(e) => setNewAlert({ ...newAlert, op: e.target.value })}>
+                <option value=">">&gt;</option>
+                <option value="<">&lt;</option>
+              </select>
+              <input type="number" value={newAlert.threshold} onChange={(e) => setNewAlert({ ...newAlert, threshold: parseFloat(e.target.value) || 0 })} />
+              <button
+                className="button"
+                onClick={async () => {
+                  try {
+                    await axios.post(`${apiBase}/alerts`, {
+                      symbol_x: symbolX,
+                      symbol_y: symbolY,
+                      metric: newAlert.metric,
+                      op: newAlert.op,
+                      threshold: newAlert.threshold
+                    });
+                    await fetchAnalytics();
+                  } catch (e) {}
+                }}
+              >
+                ➕ Add Alert
+              </button>
+            </div>
+          </div>
+          <div className="stats-card">
+            <h4>Triggered (latest)</h4>
+            <div style={{ fontSize: '0.9rem', color: '#b0b0b0' }}>
+              {(analytics.alerts || []).length === 0 ? 'None' : (
+                <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                  {analytics.alerts.map((a, idx) => (
+                    <li key={idx}>{a.message}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -13,6 +13,8 @@ class TickStorage:
         self._ensure_db()
         # in-memory per-symbol DataFrame (columns: ts (datetime), price, size)
         self.dfs = {}  # symbol -> DataFrame
+        # optional in-memory OHLCV bars loaded from files: bars[symbol][timeframe] -> DataFrame
+        self.bars = {}  # type: Dict[str, Dict[str, pd.DataFrame]]
 
     def _ensure_db(self):
         if not os.path.exists(self.db_file):
@@ -54,8 +56,38 @@ class TickStorage:
             j = json.loads(line)
             self.append_tick(j["symbol"], j["ts"], j["price"], j.get("size", 0.0))
 
+    def load_ohlcv_csv_text(self, symbol: str, timeframe: str, csv_text: str):
+        """
+        Load OHLCV bars for a given symbol and timeframe from CSV text.
+        Expected columns (case-insensitive): ts, open, high, low, close, volume
+        ts should be an ISO timestamp or parseable datetime string.
+        """
+        df = pd.read_csv(pd.io.common.StringIO(csv_text))
+        # normalize column names
+        cols = {c.lower(): c for c in df.columns}
+        required = ["ts", "open", "high", "low", "close", "volume"]
+        missing = [c for c in required if c not in cols]
+        if missing:
+            raise ValueError(f"Missing required columns in OHLCV CSV: {missing}")
+        df = df[[cols["ts"], cols["open"], cols["high"], cols["low"], cols["close"], cols["volume"]]].copy()
+        df.columns = ["ts", "open", "high", "low", "close", "volume"]
+        df["ts"] = pd.to_datetime(df["ts"])  # parse timestamps
+        df = df.sort_values("ts").set_index("ts")
+        # store in bars dict
+        sym = symbol.lower()
+        tf = timeframe
+        if sym not in self.bars:
+            self.bars[sym] = {}
+        self.bars[sym][tf] = df
+
     def export_resampled(self, symbol: str, timeframe: str):
-        df = self.get_raw(symbol)
+        # If pre-loaded OHLCV bars exist for the symbol/timeframe, return them
+        sym = symbol.lower()
+        if sym in self.bars and timeframe in self.bars[sym]:
+            df_bars = self.bars[sym][timeframe]
+            return df_bars
+        # Otherwise compute from raw ticks if available
+        df = self.get_raw(sym)
         if df.empty:
             return None
         ohlc = df["price"].resample(timeframe).ohlc()

@@ -6,6 +6,8 @@ function ControlPanel({
   onTimeframeChange,
   rollWindow,
   onRollWindowChange,
+  minVolume,
+  onMinVolumeChange,
   onRefresh,
   loading
 }) {
@@ -63,6 +65,21 @@ function ControlPanel({
           />
           <small style={{ color: '#aaa', fontSize: '0.8rem' }}>
             For Z-Score & Correlation
+          </small>
+        </div>
+
+        {/* Min Volume Filter */}
+        <div className="control-item">
+          <label>Min Volume (liquidity filter)</label>
+          <input
+            type="number"
+            value={minVolume}
+            onChange={(e) => onMinVolumeChange(parseFloat(e.target.value) || 0)}
+            min="0"
+            step="0.0001"
+          />
+          <small style={{ color: '#aaa', fontSize: '0.8rem' }}>
+            Filter bars below this volume
           </small>
         </div>
 

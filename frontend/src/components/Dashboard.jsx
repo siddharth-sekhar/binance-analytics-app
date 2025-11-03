@@ -4,11 +4,13 @@ import PriceChart from './PriceChart';
 import PairAnalytics from './PairAnalytics';
 import SummaryStats from './SummaryStats';
 import ControlPanel from './ControlPanel';
+import CorrelationHeatmap from './CorrelationHeatmap';
 
 function Dashboard({ symbols, apiBase }) {
   const [selectedSymbols, setSelectedSymbols] = useState([]);
   const [timeframe, setTimeframe] = useState('1s');
   const [rollWindow, setRollWindow] = useState(60);
+  const [minVolume, setMinVolume] = useState(0);
   const [activeProduct, setActiveProduct] = useState(0);
   const [priceData, setPriceData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -93,6 +95,8 @@ function Dashboard({ symbols, apiBase }) {
         onTimeframeChange={setTimeframe}
         rollWindow={rollWindow}
         onRollWindowChange={setRollWindow}
+        minVolume={minVolume}
+        onMinVolumeChange={setMinVolume}
         onRefresh={loadAllData}
         loading={loading}
       />
@@ -150,6 +154,7 @@ function Dashboard({ symbols, apiBase }) {
                 symbol={selectedSymbols[activeProduct]}
                 data={priceData[selectedSymbols[activeProduct]]}
                 timeframe={timeframe}
+                apiBase={apiBase}
               />
 
               {/* Pair Analytics */}
@@ -160,6 +165,17 @@ function Dashboard({ symbols, apiBase }) {
                   apiBase={apiBase}
                   timeframe={timeframe}
                   rollWindow={rollWindow}
+                  minVolume={minVolume}
+                />
+              )}
+
+              {/* Correlation Heatmap */}
+              {selectedSymbols.length >= 2 && (
+                <CorrelationHeatmap
+                  symbols={selectedSymbols}
+                  apiBase={apiBase}
+                  timeframe={timeframe}
+                  minVolume={minVolume}
                 />
               )}
             </>
