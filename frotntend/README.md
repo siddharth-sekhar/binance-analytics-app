@@ -1,16 +1,22 @@
-# React + Vite
+# Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This folder contains the frontend for the Binance Analytics App. For full project documentation and backend setup, see the repository root `README.md`.
 
-Currently, two official plugins are available:
+## Scripts
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Run these from inside this `frotntend/` folder:
 
-## React Compiler
+```powershell
+npm install
+npm run dev     # http://localhost:5173
+npm run build   # production build
+npm run preview # preview built app
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The app is configured to talk to the backend at `http://localhost:8000/api` (see `src/App.jsx`).
 
-## Expanding the ESLint configuration
+## Notes
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Dev server port is configured in `vite.config.js` (5173 by default).
+- Charts use Plotly (via `react-plotly.js`).
+- If you see an error on `npm run dev`, make sure you are on Node 18+ and reinstall dependencies (`npm install`).
