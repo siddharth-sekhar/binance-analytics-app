@@ -1,0 +1,87 @@
+# --- Global ---
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors/IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files (keep secrets out of git)
+.env
+.env.local
+.env.*.local
+
+# Logs & debug
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Coverage & test caches
+.coverage
+.coverage.*
+coverage/
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Python / Backend ---
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.coverage*
+backend/coverage/
+backend/htmlcov/
+backend/build/
+backend/dist/
+backend/*.egg-info/
+backend/.env
+backend/.env.local
+backend/.env.*.local
+# Virtual environments
+backend/venv/
+backend/.venv/
+backend/env/
+backend/.envdir/
+backend/myvenv/
+# Local SQLite databases
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+backend_ticks.db
+
+# --- Node / Frontend (Vite React) ---
+# note: folder is named 'frotntend' in this repo
+frotntend/node_modules/
+frotntend/dist/
+frotntend/.vite/
+frotntend/.eslintcache
+frotntend/.env.local
+frotntend/.env.*.local
+
+# Lockfiles are generally tracked; do NOT ignore package-lock.json/yarn.lock by default
+# frotntend/package-lock.json
+# frotntend/yarn.lock
+
+# Misc
+*.tmp
+*.temp
+*.bak
+
+# Binary wheels or archives
+*.whl
+*.zip
+*.tar
+*.tar.gz
+
+# Python version managers
+.python-version
