@@ -8,10 +8,13 @@ A full‑stack, real‑time analytics dashboard for Binance perpetual futures sy
 - Upload NDJSON historical ticks and resample to OHLCV
 - Upload OHLCV CSV (ts, open, high, low, close, volume) per symbol/timeframe
 - Resampling intervals: 1s, 1min, 5min (configurable in UI)
-- Pair analytics: OLS hedge ratio (β, α), R², spread, rolling z‑score, rolling correlation
-- ADF stationarity test for spread
-- CSV export per symbol/timeframe
-- Basic in‑memory alert rules API (no UI yet)
+- Pair analytics: OLS and Kalman hedge (β, α), R², spread, rolling z‑score, rolling correlation
+- Stationarity via ADF test
+- Liquidity filter (min volume) for analytics inputs
+- Mini mean‑reversion backtest (z>2 entry, z<0 exit) with equity curve
+- Cross‑correlation heatmap for multiple symbols
+- Rule‑based alerts (zscore/spread); UI to add rules and view latest triggers
+- CSV exports: OHLCV per symbol/timeframe and analytics outputs (spread, zscore, corr)
 - WebSocket heartbeat with latest prices per symbol
 
 ## Tech Stack
@@ -30,14 +33,19 @@ assets/           # Misc HTML/demo assets
 Key backend files:
 - `backend/app.py` — FastAPI routes and WebSocket
 - `backend/ingestion.py` — Binance fstream ingestion (per‑symbol WS tasks)
-- `backend/analytics.py` — Resampling & analytics (OLS, ADF, z‑score, corr)
-- `backend/storage.py` — In‑memory DataFrames + SQLite tick persistence
+- `backend/analytics.py` — Resampling & analytics (OLS, Kalman, ADF, z‑score, corr, backtest)
+- `backend/storage.py` — In‑memory DataFrames + SQLite tick persistence + OHLCV loader
 - `backend/schemas.py` — Pydantic models for requests/responses
 - `backend/requirements.txt` — Python dependencies
 
 Key frontend files:
 - `frontend/src/App.jsx` — App shell, tabs, API base
-- `frontend/src/components/*` — Dashboard, charts, controls, ingestion panel
+- `frontend/src/components/Dashboard.jsx` — Orchestrates controls, charts, analytics
+- `frontend/src/components/ControlPanel.jsx` — Symbol selection, timeframe, rolling window, min volume
+- `frontend/src/components/PriceChart.jsx` — Candles + volume + CSV download button
+- `frontend/src/components/PairAnalytics.jsx` — Spread, z‑score, corr, backtest, regression selector, alerts UI, analytics CSV download
+- `frontend/src/components/CorrelationHeatmap.jsx` — Cross‑correlation heatmap
+- `frontend/src/components/DataIngestion.jsx` — Start WS ingestion + upload OHLCV CSV
 - `frontend/vite.config.js` — Dev server host/port (5173)
 
 ## Prerequisites
@@ -81,6 +89,9 @@ Open http://localhost:5173 in your browser. The app expects the backend at http:
 - In the "Analytics Dashboard" tab, select symbols and timeframe
 - View candlestick + volume charts
 - If two symbols are selected, pair analytics (spread, z‑score, correlation) are shown
+- Use the Regression selector (OLS/Kalman) and Min Volume filter to refine analytics
+- Backtest equity curve appears under Pair Analytics
+- Cross‑correlation heatmap appears when 2+ symbols are selected
 
 Optional) Upload OHLCV CSV
 - In the "Data Ingestion" tab, use the "Upload OHLCV CSV" section
@@ -88,7 +99,10 @@ Optional) Upload OHLCV CSV
 - Submit to load bars directly; these bars will be used for that symbol/timeframe
 
 3) Export data
-- Use the backend export endpoint to download CSV: `/api/export/{symbol}?timeframe=1s`
+- From the charts:
+  - Price chart: use the "Download CSV" button to fetch symbol OHLCV
+  - Pair analytics: use the "Download Analytics CSV" button (includes spread, zscore, corr)
+- Or via API endpoints (see below)
 
 ## API Reference (selected)
 
@@ -113,14 +127,20 @@ Base URL: `http://localhost:8000/api`
 - GET `/resampled/{symbol}?timeframe=1s`
   - Returns OHLCV data resampled from raw ticks
 
-- GET `/analytics/pair?x=btcusdt&y=ethusdt&timeframe=1s&roll_window=60`
-  - Returns hedge ratio (β, α, R²), spread, z‑score, rolling correlation, ADF results
+- GET `/analytics/pair?x=btcusdt&y=ethusdt&timeframe=1s&roll_window=60&regression=ols|kalman&min_volume=0`
+  - Returns hedge (β, α, R²), spread, z‑score, rolling correlation, ADF, backtest, latest alerts
 
 - GET `/export/{symbol}?timeframe=1s`
-  - Streams CSV for download
+  - Streams CSV for OHLCV download
 
-- Alerts (prototype, no UI):
-  - POST `/alerts` — add rule `{symbol_x, symbol_y, metric, op, threshold}`
+- GET `/analytics/pair_export?x=btcusdt&y=ethusdt&timeframe=1s&roll_window=60&regression=ols&min_volume=0`
+  - Streams CSV with columns: `ts, spread, zscore, corr`
+
+- GET `/analytics/corr_matrix?symbols=btcusdt,ethusdt,bnbusdt&timeframe=1s&min_volume=0`
+  - Returns `{ symbols: [...], matrix: number[][] }` cross‑correlation matrix
+
+- Alerts:
+  - POST `/alerts` — add rule `{symbol_x, symbol_y, metric, op, threshold}` (metric: `zscore`|`spread`)
   - GET `/alerts` — list rules
   - DELETE `/alerts/{id}` — remove rule
 
@@ -147,7 +167,7 @@ Base URL: `http://localhost:8000/api`
 - Frontend `npm run dev` fails immediately:
   - Ensure Node.js ≥ 18: `node -v`
   - Remove and re‑install deps: `rm -r node_modules package-lock.json` then `npm install`
-  - Port 5173 in use? Change `frotntend/vite.config.js` or stop the other process
+  - Port 5173 in use? Change `frontend/vite.config.js` or stop the other process
 
 - Backend won’t start or import errors:
   - Activate the virtual environment in the same shell
@@ -173,8 +193,8 @@ npm run preview
 
 ## Roadmap
 
-- Alert evaluation hooked to analytics stream and UI notifications
-- Persisted resampled bars and configurable retention
+- Persist OHLCV uploads to disk and allow deletion/management
+- Configurable backtest parameters and trade accounting
 - Dockerfiles and compose for one‑command startup
 - Environment‑based config for API base and ports
 
