@@ -25,7 +25,7 @@ function CorrelationHeatmap({ symbols, apiBase, timeframe = '1s', minVolume = 0 
   }, [symbols, apiBase, timeframe, minVolume]);
 
   if (!symbols || symbols.length < 2) return null;
-  if (error) return <div className="error">❌ {error}</div>;
+  if (error) return <div className="error">Error: {error}</div>;
   if (!data) return null;
 
   const z = data.matrix || [];
@@ -33,7 +33,7 @@ function CorrelationHeatmap({ symbols, apiBase, timeframe = '1s', minVolume = 0 
 
   return (
     <div className="chart-container">
-      <h3 className="chart-title">🧊 Cross-Correlation Heatmap</h3>
+  <h3 className="chart-title">Cross-Correlation Heatmap</h3>
       <Plot
         data={[{
           z,

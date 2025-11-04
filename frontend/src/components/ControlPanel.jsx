@@ -13,7 +13,7 @@ function ControlPanel({
 }) {
   return (
     <div className="control-panel">
-      <h2 style={{ marginBottom: '1rem', color: '#8b7ab8' }}>📊 Control Panel</h2>
+      <h2 style={{ marginBottom: '1rem', color: '#8b7ab8' }}>Control Panel</h2>
       
       <div className="control-group">
         {/* Symbol Selection */}
@@ -91,7 +91,7 @@ function ControlPanel({
             disabled={loading}
             style={{ marginTop: 'auto' }}
           >
-            {loading ? '⟳ Loading...' : '🔄 Refresh Data'}
+            {loading ? 'Loading...' : 'Refresh Data'}
           </button>
         </div>
       </div>

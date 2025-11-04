@@ -71,7 +71,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
   if (error) {
     return (
       <div className="chart-container">
-        <div className="error">❌ {error}</div>
+        <div className="error">Error: {error}</div>
       </div>
     );
   }
@@ -188,7 +188,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
   return (
     <div>
       <h2 style={{ color: '#8b7ab8', marginBottom: '1.5rem' }}>
-        📈 Pair Analytics: {symbolX?.toUpperCase()} vs {symbolY?.toUpperCase()}
+        Pair Analytics: {symbolX?.toUpperCase()} vs {symbolY?.toUpperCase()}
       </h2>
 
       {/* Hedge Ratio & ADF Stats */}
@@ -230,7 +230,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
               background: adfTrigger ? '#26a69a' : undefined
             }}
           >
-            {adfTrigger ? '✓ Tested' : '🔄 Run ADF Test'}
+            {adfTrigger ? 'Tested' : 'Run ADF Test'}
           </button>
         </div>
         
@@ -260,7 +260,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
               window.open(url, '_blank');
             }}
           >
-            ⬇️ Download Analytics CSV
+            Download Analytics CSV
           </button>
         </div>
         
@@ -270,7 +270,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
             color: analytics.adf?.pvalue < 0.05 ? '#26a69a' : '#ef5350',
             fontSize: '1.2rem'
           }}>
-            {analytics.adf?.pvalue < 0.05 ? '✓ Stationary' : '✗ Non-Stationary'}
+            {analytics.adf?.pvalue < 0.05 ? 'Stationary' : 'Non-Stationary'}
           </div>
           <small style={{ color: '#aaa' }}>
             {analytics.adf?.pvalue < 0.05 
@@ -284,7 +284,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
       <div className="charts-grid">
         {/* Spread Chart */}
         <div className="chart-container">
-          <h3 className="chart-title">📉 Spread (Y - β*X - α)</h3>
+          <h3 className="chart-title">Spread (Y - β*X - α)</h3>
           <Plot
             data={[spreadTrace]}
             layout={{
@@ -299,7 +299,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
 
         {/* Z-Score Chart */}
         <div className="chart-container">
-          <h3 className="chart-title">📊 Z-Score (Rolling {rollWindow} periods)</h3>
+          <h3 className="chart-title">Z-Score (Rolling {rollWindow} periods)</h3>
           <Plot
             data={[zscoreTrace, zscoreUpperBand, zscoreLowerBand, zscoreZeroLine]}
             layout={{
@@ -314,7 +314,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
 
         {/* Correlation Chart */}
         <div className="chart-container">
-          <h3 className="chart-title">🔗 Rolling Correlation</h3>
+          <h3 className="chart-title">Rolling Correlation</h3>
           <Plot
             data={[corrTrace]}
             layout={{
@@ -333,7 +333,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
 
         {/* Backtest Equity Curve */}
         <div className="chart-container">
-          <h3 className="chart-title">💼 Backtest Equity (Z-Score MR)</h3>
+          <h3 className="chart-title">Backtest Equity (Z-Score MR)</h3>
           <Plot
             data={[{
               x: equityTimestamps,
@@ -411,7 +411,7 @@ function PairAnalytics({ symbolX, symbolY, apiBase, timeframe, rollWindow, minVo
         fontSize: '0.9rem',
         color: '#808080'
       }}>
-        <strong>📝 Note:</strong> Z-Score bands at ±2σ indicate potential mean reversion opportunities. 
+        <strong>Note:</strong> Z-Score bands at ±2σ indicate potential mean reversion opportunities. 
         ADF test p-value &lt; 0.05 suggests the spread is stationary (mean-reverting).
       </div>
     </div>

@@ -28,19 +28,19 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🚀 Binance Analytics Dashboard</h1>
+        <h1>Binance Analytics Dashboard</h1>
         <nav className="tabs">
           <button 
             className={activeTab === 'dashboard' ? 'active' : ''} 
             onClick={() => setActiveTab('dashboard')}
           >
-            📊 Analytics Dashboard
+            Analytics Dashboard
           </button>
           <button 
             className={activeTab === 'ingestion' ? 'active' : ''} 
             onClick={() => setActiveTab('ingestion')}
           >
-            📥 Data Ingestion
+            Data Ingestion
           </button>
         </nav>
       </header>

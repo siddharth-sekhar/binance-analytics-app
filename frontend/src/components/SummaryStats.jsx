@@ -26,7 +26,7 @@ function SummaryStats({ symbol, data }) {
   return (
     <div style={{ marginBottom: '2rem' }}>
       <h3 style={{ color: '#8b7ab8', marginBottom: '1rem' }}>
-        📊 Summary Statistics - {symbol?.toUpperCase()}
+        Summary Statistics - {symbol?.toUpperCase()}
       </h3>
       
       <div className="summary-stats">
