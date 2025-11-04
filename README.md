@@ -212,7 +212,7 @@ This project was built with assistance from AI pair‑programming tools to speed
   - Removed UI emojis and standardized labels for a cleaner, professional look.
 
 - Documentation and DX improvements
-  - Wrote concise Quick Start instructions, added Architecture section placeholders, and a Demo video section for future embedding.
+  - Wrote concise Quick Start instructions, added Architecture section placeholders, and a Demo video section
   - Added troubleshooting notes and clarified local URLs and ports for the services.
 
 Responsible use
