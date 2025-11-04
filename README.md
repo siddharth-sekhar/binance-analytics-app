@@ -22,6 +22,11 @@ A full‑stack, real‑time analytics dashboard for Binance perpetual futures sy
 - Backend: FastAPI, websockets, pandas, numpy, statsmodels, scipy, SQLite
 - Frontend: React (Vite), Plotly.js, react‑plotly.js, axios
 
+## Architecture diagram
+
+<!-- Add your architecture image here when ready -->
+<!-- Example: ![Architecture](assets/architecture.png) -->
+
 ## Repository Structure
 
 ```
@@ -55,6 +60,26 @@ Key frontend files:
 - Node.js 18+ (Node 20+ recommended for Vite 7)
 
 ## Quick Start (local)
+
+### One-command start (Windows)
+
+From the repo root, run to set up dependencies and launch both backend and frontend together:
+
+```powershell
+# PowerShell (recommended)
+powershell -ExecutionPolicy Bypass -File .\run.ps1
+
+# or simply double-click run.bat (opens PowerShell and runs the same)
+```
+
+Flags:
+- `-SkipInstall` to skip dependency installation if you’re already set up
+
+Once running:
+- Backend API and docs: http://localhost:8000/docs
+- Frontend UI: http://localhost:5173
+
+---
 
 Run backend (http://localhost:8000):
 
