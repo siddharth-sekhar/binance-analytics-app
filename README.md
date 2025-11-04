@@ -23,7 +23,7 @@ A full‑stack, real‑time analytics dashboard for Binance perpetual futures sy
 
 ## Demo video
 
-<!-- Demo video will be added here (link or embedded player) -->
+[<!-- Demo video will be added here (link or embedded player) -->](https://github.com/user-attachments/assets/6b7a6a73-219e-4bdc-9722-0077e9537216)
 
 ## Tech Stack
 
