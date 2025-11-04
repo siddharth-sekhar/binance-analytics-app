@@ -19,8 +19,7 @@ A full‑stack, real‑time analytics dashboard for Binance perpetual futures sy
 
 ## Architecture diagram
 
-<!-- Add your architecture image here when ready -->
-<!-- Example: ![Architecture](assets/architecture.png) -->
+![Architecture](https://github.com/siddharth-sekhar/binance-analytics-app/blob/ae3796643045eb0410d08ae3325fb9648d95e4a0/binance-analytics.drawio.png) -->
 
 ## Tech Stack
 
@@ -34,25 +33,6 @@ backend/          # FastAPI service, ingestion, analytics, storage
 frontend/         # React + Vite app
 assets/           # Misc HTML/demo assets
 ```
-
-Key backend files:
-- `backend/app.py` — FastAPI routes and WebSocket
-- `backend/ingestion.py` — Binance fstream ingestion (per‑symbol WS tasks)
-- `backend/analytics.py` — Resampling & analytics (OLS, Kalman, ADF, z‑score, corr, backtest)
-- `backend/storage.py` — In‑memory DataFrames + SQLite tick persistence + OHLCV loader
-- `backend/schemas.py` — Pydantic models for requests/responses
-- `backend/requirements.txt` — Python dependencies
-
-Key frontend files:
-- `frontend/src/App.jsx` — App shell, tabs, API base
-- `frontend/src/components/Dashboard.jsx` — Orchestrates controls, charts, analytics
-- `frontend/src/components/ControlPanel.jsx` — Symbol selection, timeframe, rolling window, min volume
-- `frontend/src/components/PriceChart.jsx` — Candles + volume + CSV download button
-- `frontend/src/components/PairAnalytics.jsx` — Spread, z‑score, corr, backtest, regression selector, alerts UI, analytics CSV download
-- `frontend/src/components/CorrelationHeatmap.jsx` — Cross‑correlation heatmap
-- `frontend/src/components/DataIngestion.jsx` — Start WS ingestion + upload OHLCV CSV
-- `frontend/vite.config.js` — Dev server host/port (5173)
-
 ## Prerequisites
 
 - Windows PowerShell (v5+)
@@ -222,7 +202,3 @@ npm run preview
 - Configurable backtest parameters and trade accounting
 - Dockerfiles and compose for one‑command startup
 - Environment‑based config for API base and ports
-
-## License
-
-MIT (or your preferred license)
