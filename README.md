@@ -17,15 +17,15 @@ A full‑stack, real‑time analytics dashboard for Binance perpetual futures sy
 - CSV exports: OHLCV per symbol/timeframe and analytics outputs (spread, zscore, corr)
 - WebSocket heartbeat with latest prices per symbol
 
-## Tech Stack
-
-- Backend: FastAPI, websockets, pandas, numpy, statsmodels, scipy, SQLite
-- Frontend: React (Vite), Plotly.js, react‑plotly.js, axios
-
 ## Architecture diagram
 
 <!-- Add your architecture image here when ready -->
 <!-- Example: ![Architecture](assets/architecture.png) -->
+
+## Tech Stack
+
+- Backend: FastAPI, websockets, pandas, numpy, statsmodels, scipy, SQLite
+- Frontend: React (Vite), Plotly.js, react‑plotly.js, axios
 
 ## Repository Structure
 
