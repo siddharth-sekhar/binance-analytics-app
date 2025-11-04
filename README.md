@@ -48,8 +48,6 @@ From the repo root, run to set up dependencies and launch both backend and front
 ```powershell
 # PowerShell (recommended)
 powershell -ExecutionPolicy Bypass -File .\run.ps1
-
-# or simply double-click run.bat (opens PowerShell and runs the same)
 ```
 
 Flags:
