@@ -47,6 +47,14 @@ if (-not $SkipInstall) {
   if (Test-Path (Join-Path $Frontend 'package-lock.json')) { npm ci } else { npm install }
   Pop-Location
 }
+else {
+  # Quick sanity check: ensure uvicorn is available in the venv when skipping installs
+  & $venvPy -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('uvicorn') else 1)"
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "Backend dependencies not found (uvicorn missing) in $Venv. Re-run without -SkipInstall to install dependencies." -ForegroundColor Red
+    exit 1
+  }
+}
 
 # Start backend and frontend as jobs
 $backendJob = Start-Job -Name 'backend' -ScriptBlock {
@@ -61,6 +69,16 @@ $frontendJob = Start-Job -Name 'frontend' -ScriptBlock {
 Write-Host "Backend:  http://localhost:8000/docs" -ForegroundColor Green
 Write-Host "Frontend: http://localhost:5173" -ForegroundColor Green
 Write-Host "Press Ctrl+C to stop both services..." -ForegroundColor Yellow
+
+# Brief health check: if backend job fails immediately, surface logs
+Start-Sleep -Seconds 3
+$bj = Get-Job -Name 'backend' -ErrorAction SilentlyContinue
+if ($bj -and $bj.State -ne 'Running') {
+  Write-Host "Backend failed to start. Details:" -ForegroundColor Red
+  Receive-Job -Job $bj -Keep -ErrorAction SilentlyContinue
+  if ($frontendJob) { Stop-Job -Job $frontendJob -Force -ErrorAction SilentlyContinue }
+  exit 1
+}
 
 try {
   while ($true) { Start-Sleep -Seconds 1 }

@@ -25,7 +25,6 @@ storage = TickStorage(db_file="backend_ticks.db")
 ingestor = Ingestor(storage)
 alerts = AlertEngine()
 
-# simple set of connected websocket clients to push analytics
 ws_clients = set()
 
 @app.post("/api/ingest/start")

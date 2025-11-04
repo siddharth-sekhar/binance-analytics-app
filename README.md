@@ -19,7 +19,11 @@ A full‑stack, real‑time analytics dashboard for Binance perpetual futures sy
 
 ## Architecture diagram
 
-![Architecture](https://github.com/siddharth-sekhar/binance-analytics-app/blob/ae3796643045eb0410d08ae3325fb9648d95e4a0/binance-analytics.drawio.png) -->
+![Architecture](https://github.com/siddharth-sekhar/binance-analytics-app/blob/ae3796643045eb0410d08ae3325fb9648d95e4a0/binance-analytics.drawio.png)
+
+## Demo video
+
+<!-- Demo video will be added here (link or embedded player) -->
 
 ## Tech Stack
 
@@ -193,6 +197,28 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+## AI usage
+
+This project was built with assistance from AI pair‑programming tools to speed up development and documentation while keeping human ownership over design and logic.
+
+- Planning and scaffolding
+  - Helped outline the full‑stack structure (FastAPI backend + React/Vite frontend) and identify key modules (ingestion, analytics, storage, alerts).
+  - Suggested a clean one‑command Windows launcher (`run.ps1`) to bootstrap the dev environment and run both services.
+
+- Code assistance (reviewed and edited by the author)
+  - Drafted and refined the FastAPI app wiring and React component props/state flow.
+  - Produced small utility snippets and improved error messages and DX (e.g., early failure surfacing in `run.ps1`).
+  - Removed UI emojis and standardized labels for a cleaner, professional look.
+
+- Documentation and DX improvements
+  - Wrote concise Quick Start instructions, added Architecture section placeholders, and a Demo video section for future embedding.
+  - Added troubleshooting notes and clarified local URLs and ports for the services.
+
+Responsible use
+- All AI‑generated content was reviewed, tested, and adapted to the project’s needs.
+- No proprietary code was copied; dependencies are declared in `backend/requirements.txt` and `frontend/package.json`.
+- Final logic for analytics (hedge ratios, z‑scores, ADF checks, correlations) remains transparent and auditable in the repo.
 
 ## Roadmap
 
